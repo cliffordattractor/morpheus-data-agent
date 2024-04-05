@@ -1,10 +1,8 @@
 import tools
-import logging
-from flask import Flask, request, jsonify
 from huggingface_hub import hf_hub_download
-from accelerate import Accelerator
+from langchain import hub
+from langchain.agents import AgentExecutor, create_react_agent
 from langchain_community.llms import LlamaCpp
-from langchain.agents import initialize_agent
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from config import Config
@@ -15,7 +13,7 @@ def download_model(model_name, revision):
     return model_directory
 
 def load_llm():
-    model_path = Config.MODEL_PATH
+    model_path = download_model(Config.MODEL_NAME, Config.MODEL_REVISION)
     n_gpu_layers = 0
     n_batch = 512
     callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])

@@ -1,8 +1,6 @@
 import tools
-import logging
 from flask import Flask, request, jsonify
 from huggingface_hub import hf_hub_download
-from accelerate import Accelerator
 from langchain_community.llms import LlamaCpp
 from langchain.agents import initialize_agent
 from langchain.callbacks.manager import CallbackManager
@@ -17,15 +15,17 @@ def download_model(model_name, revision):
 def load_llm():
     model_path = Config.MODEL_PATH
     n_gpu_layers = 0
-    n_batch = 512
+    n_batch = 1024
     callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
     
     llm = LlamaCpp(
         model_path=model_path,
         n_gpu_layers=n_gpu_layers,
         n_batch=n_batch,
-        n_ctx=4000,
-        f16_kv=False,
+        n_ctx=1024,
+        f16_kv=True,
+        use_mlock=True,
+        use_mmap=True,
         callback_manager=callback_manager,
         temperature=0.1,
         streaming=False
